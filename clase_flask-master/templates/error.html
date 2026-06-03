@@ -1,0 +1,36 @@
+{% extends 'plantilla.html' %}
+{% block title %}Error {{ codigo_error }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <div class="card border-danger">
+      <div class="card-body text-center">
+        <h1 class="display-1 text-danger">{{ codigo_error }}</h1>
+        <h2 class="card-title mb-4">
+          {% if codigo_error == 404 %}
+          Página No Encontrada
+          {% elif codigo_error == 403 %}
+          Acceso Denegado
+          {% elif codigo_error == 500 %}
+          Error del Servidor
+          {% else %}
+          Error
+          {% endif %}
+        </h2>
+        <p class="card-text lead">{{ mensaje }}</p>
+        
+        <div class="mt-4">
+          <a href="{% if session.get('usuario_id') %}/dashboard{% else %}/login{% endif %}" class="btn btn-primary btn-lg">
+            {% if codigo_error == 404 %}
+            🔙 Ir al Dashboard
+            {% else %}
+            🔙 Volver
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

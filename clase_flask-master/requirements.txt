@@ -1,0 +1,6 @@
+flask
+pymongo
+werkzeug
+bleach
+python-dotenv
+flask-wtf

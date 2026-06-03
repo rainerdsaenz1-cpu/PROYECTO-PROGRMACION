@@ -1,0 +1,196 @@
+{% extends 'plantilla.html' %}
+{% block title %}Registrarse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg">
+      <div class="card-body p-5">
+        <h2 class="card-title text-center mb-4">📝 Registrarse</h2>
+        
+        <form method="POST" action="/register">
+          {{ csrf_field() }}
+          <div class="mb-3">
+            <label for="username" class="form-label">Usuario:</label>
+            <input type="text" 
+                   id="username"
+                   name="username" 
+                   class="form-control" 
+                   placeholder="3-20 caracteres"
+                   required
+                   minlength="3"
+                   maxlength="20"
+                   pattern="^[a-zA-Z0-9_-]+$"
+                   title="Solo letras, números, guiones y guiones bajos"
+                   value="{{ old_username | default('') }}">
+            <small class="form-text text-muted">
+              Alfanumérico, guiones y guiones bajos permitidos
+            </small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" 
+                   id="email"
+                   name="email" 
+                   class="form-control" 
+                   placeholder="tu@email.com"
+                   required
+                   maxlength="120"
+                   value="{{ old_email | default('') }}">
+          </div>
+          
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña:</label>
+            <div class="input-group">
+              <input type="password" 
+                     id="password"
+                     name="password" 
+                     class="form-control" 
+                     placeholder="Mínimo 8 caracteres"
+                     required
+                     minlength="8">
+              <button type="button" class="btn btn-outline-secondary" id="togglePassword" style="display: none;" title="Mostrar/Ocultar contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <ul class="list-unstyled mb-0 mt-2">
+              <li id="rule-length" class="text-danger">✗ Mínimo 8 caracteres</li>
+              <li id="rule-uppercase" class="text-danger">✗ Al menos 1 mayúscula</li>
+              <li id="rule-number" class="text-danger">✗ Al menos 1 número</li>
+              <li id="rule-special" class="text-danger">✗ Al menos 1 carácter especial (!@#$%^&*...)</li>
+            </ul>
+          </div>
+          
+          <div class="mb-3">
+            <label for="password_confirm" class="form-label">Confirmar Contraseña:</label>
+            <div class="input-group">
+              <input type="password" 
+                     id="password_confirm"
+                     name="password_confirm" 
+                     class="form-control" 
+                     placeholder="Repite tu contraseña"
+                     required
+                     minlength="8">
+              <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm" style="display: none;" title="Mostrar/Ocultar contraseña">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div id="rule-match" class="form-text text-danger mt-2">✗ Las contraseñas deben coincidir</div>
+          </div>
+          
+          <div class="mb-3">
+            <div class="alert alert-info" role="alert">
+              <strong>Nota:</strong> El registro crea automáticamente un usuario con rol <strong>operador</strong>.
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-success w-100 btn-lg">
+            Crear Cuenta
+          </button>
+        </form>
+        
+        <hr class="my-4">
+        
+        <p class="text-center mb-0">
+          ¿Ya tienes cuenta?
+          <a href="/login" class="text-decoration-none fw-bold">Inicia sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // ===== MOSTRAR/OCULTAR CONTRASEÑA =====
+  const passwordField = document.getElementById('password');
+  const confirmField = document.getElementById('password_confirm');
+  const toggleButton = document.getElementById('togglePassword');
+  const toggleConfirmButton = document.getElementById('togglePasswordConfirm');
+
+  function setupPasswordToggle(field, button) {
+    const icon = button.querySelector('i');
+    
+    field.addEventListener('input', () => {
+      button.style.display = field.value.length > 0 ? 'block' : 'none';
+    });
+
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPassword = field.type === 'password';
+      field.type = isPassword ? 'text' : 'password';
+      icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  }
+
+  setupPasswordToggle(passwordField, toggleButton);
+  setupPasswordToggle(confirmField, toggleConfirmButton);
+
+  // ===== VALIDACIÓN DE CONTRASEÑA =====
+  const rules = [
+    {
+      field: document.getElementById('rule-length'),
+      validate: value => value.length >= 8
+    },
+    {
+      field: document.getElementById('rule-uppercase'),
+      validate: value => /[A-Z]/.test(value)
+    },
+    {
+      field: document.getElementById('rule-number'),
+      validate: value => /[0-9]/.test(value)
+    },
+    {
+      field: document.getElementById('rule-special'),
+      validate: value => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)
+    }
+  ];
+
+  const matchRule = document.getElementById('rule-match');
+
+  function updatePasswordRules() {
+    const value = passwordField.value;
+    rules.forEach(rule => {
+      if (rule.validate(value)) {
+        rule.field.classList.remove('text-danger');
+        rule.field.classList.add('text-success');
+        rule.field.textContent = '✓ ' + rule.field.textContent.slice(2);
+      } else {
+        rule.field.classList.remove('text-success');
+        rule.field.classList.add('text-danger');
+        rule.field.textContent = '✗ ' + rule.field.textContent.slice(2);
+      }
+    });
+    updateMatchRule();
+  }
+
+  function updateMatchRule() {
+    if (!confirmField.value) {
+      matchRule.classList.remove('text-success');
+      matchRule.classList.add('text-danger');
+      matchRule.textContent = '✗ Las contraseñas deben coincidir';
+      return;
+    }
+
+    if (passwordField.value === confirmField.value) {
+      matchRule.classList.remove('text-danger');
+      matchRule.classList.add('text-success');
+      matchRule.textContent = '✓ Las contraseñas coinciden';
+    } else {
+      matchRule.classList.remove('text-success');
+      matchRule.classList.add('text-danger');
+      matchRule.textContent = '✗ Las contraseñas deben coincidir';
+    }
+  }
+
+  passwordField.addEventListener('input', updatePasswordRules);
+  confirmField.addEventListener('input', updateMatchRule);
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updatePasswordRules();
+    updateMatchRule();
+  });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'plantilla.html' %}
+{% block title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+  <div class="col-md-12">
+    <h2 class="mb-4">📊 Panel Administrador - Gestión de Transacciones</h2>
+
+    <!-- Buscador Seguro -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">🔍 Buscar Transacciones</h5>
+      </div>
+      <div class="card-body">
+        <form method="GET" class="row g-2">
+          <div class="col-md-8">
+            <input type="text" 
+                   name="id" 
+                   class="form-control" 
+                   placeholder="Buscar por ID del cliente"
+                   value="{{ busqueda }}"
+                   maxlength="50">
+            <small class="form-text text-muted">
+              Búsqueda exacta - Caracteres especiales se descartan automáticamente
+            </small>
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">
+              🔍 Buscar
+            </button>
+            <a href="/admin" class="btn btn-secondary w-100 mt-2">
+              🔄 Limpiar Filtro
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Información de Seguridad -->
+    <div class="alert alert-success" role="alert">
+      <strong>✅ Zona Segura:</strong> Los datos se muestran con escape HTML correcto. 
+      No es posible ejecutar código JavaScript o NoSQL injection en este panel.
+    </div>
+
+    <!-- Tabla de Transacciones -->
+    {% if registros|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID Cliente</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Fecha/Hora</th>
+            <th>Creador</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reg in registros %}
+          <tr>
+            <td>
+              <code>{{ reg.id }}</code>
+            </td>
+            <td>{{ reg.nombre }}</td>
+            <td>{{ reg.apellido }}</td>
+            <td>
+              <span class="badge bg-info">{{ reg.tipo }}</span>
+            </td>
+            <td class="text-end">
+              <strong>${{ "%.2f"|format(reg.valor) }}</strong>
+            </td>
+            <td>
+              <small>{{ reg.fecha_hora }}</small>
+            </td>
+            <td>
+              <small>{{ reg.get('usuario_creador', 'Sistema') }}</small>
+            </td>
+            <td>
+              {% if reg.get('usuario_creador') != '[usuario eliminado]' %}
+                <a href="/editar/{{ reg._id }}" class="btn btn-sm btn-warning" title="Modificar">
+                  ✏️ Editar
+                </a>
+              {% else %}
+                <button class="btn btn-sm btn-secondary" disabled title="Bloqueado">
+                  🔒 Bloqueado
+                </button>
+              {% endif %}
+              <form method="POST" action="/eliminar/{{ reg._id }}" style="display:inline;" 
+                    onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta transacción?');">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                  🗑️ Eliminar
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Resultados:</strong> Se encontraron <strong>{{ registros|length }}</strong> transacción(es)
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+      <h5>📭 Sin Resultados</h5>
+      <p>No hay transacciones que coincidan con tu búsqueda.</p>
+      <a href="/admin" class="btn btn-primary">Ver todas las transacciones</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Información de Seguridad -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">🔒 Medidas de Seguridad en Este Panel</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="fw-bold">✅ Protección XSS</h6>
+            <ul class="small mb-0">
+              <li>Escape HTML en todos los campos mostrados</li>
+              <li>Sin uso de filtro |safe para datos de usuario</li>
+              <li>Validación de caracteres especiales</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-bold">✅ Protección NoSQL Injection</h6>
+            <ul class="small mb-0">
+              <li>Rechazo de operadores especiales ($ne, $or, etc.)</li>
+              <li>Búsqueda exacta en lugar de regex</li>
+              <li>Validación de parámetros antes de usarlos</li>
+            </ul>
+          </div>
+          <div class="col-md-6 mt-3">
+            <h6 class="fw-bold">✅ Control de Acceso</h6>
+            <ul class="small mb-0">
+              <li>Solo administradores pueden acceder</li>
+              <li>Verificación de rol en cada acción</li>
+              <li>Auditoría de cambios</li>
+            </ul>
+          </div>
+          <div class="col-md-6 mt-3">
+            <h6 class="fw-bold">✅ Validación de Datos</h6>
+            <ul class="small mb-0">
+              <li>ObjectId validado para eliminación</li>
+              <li>Confirmación de usuario para cambios críticos</li>
+              <li>Validación de tipos de datos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4 mb-4">
+  <a href="/dashboard" class="btn btn-secondary">← Volver al Dashboard</a>
+</div>
+{% endblock %}

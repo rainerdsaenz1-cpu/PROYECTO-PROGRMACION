@@ -1,0 +1,139 @@
+{% extends 'plantilla.html' %}
+{% block title %}Panel Principal{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+  <div class="col-md-12">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h1 class="card-title">🏦 Bienvenido al Sistema de Banco Seguro</h1>
+        <p class="card-text lead">
+          Hola, <strong>{{ usuario_nombre }}</strong>. 
+          Tienes acceso como <span class="badge bg-info">{{ usuario_rol | upper }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  {% if es_admin %}
+    <!-- Panel Admin -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">📊 Ver Transacciones</h5>
+          <p class="card-text">Visualiza, busca, edita y elimina transacciones de la base de datos.</p>
+          <a href="/admin" class="btn btn-primary">
+            Ir al Panel de Admin
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">👥 Gestionar Usuarios</h5>
+          <p class="card-text">Administra usuarios, roles y permisos del sistema.</p>
+          <a href="/usuarios" class="btn btn-primary">
+            Gestionar Usuarios
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Seguridad -->
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">🔒 Medidas de Seguridad Implementadas</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="fw-bold text-success">✅ Prevención de XSS</h6>
+              <ul class="small">
+                <li>Sanitización de todas las entradas del usuario</li>
+                <li>Escape correcto de HTML en plantillas</li>
+                <li>Validación de caracteres especiales</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="fw-bold text-success">✅ Prevención de Inyección NoSQL</h6>
+              <ul class="small">
+                <li>Rechazo de operadores especiales de MongoDB</li>
+                <li>Validación de parámetros de consulta</li>
+                <li>Uso de ObjectId para búsquedas seguras</li>
+              </ul>
+            </div>
+            <div class="col-md-6 mt-3">
+              <h6 class="fw-bold text-success">✅ Autenticación Segura</h6>
+              <ul class="small">
+                <li>Hash de contraseñas con PBKDF2</li>
+                <li>Gestión de sesiones segura</li>
+                <li>Control basado en roles (RBAC)</li>
+              </ul>
+            </div>
+            <div class="col-md-6 mt-3">
+              <h6 class="fw-bold text-success">✅ Control de Acceso</h6>
+              <ul class="small">
+                <li>Decoradores de verificación de rol</li>
+                <li>Restricción de funciones por perfil</li>
+                <li>Auditoría de acciones</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  {% else %}
+    <!-- Panel Operador -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">💳 Ingresar Transacción</h5>
+          <p class="card-text">Crea nuevas transacciones en la base de datos de forma segura.</p>
+          <a href="/operador" class="btn btn-primary">
+            Ir al Formulario
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">ℹ️ Qué puedes hacer</h5>
+          <p class="card-text">
+            Como Operador, tu función es ingresar transacciones de manera segura.
+            No mostramos opciones que no te corresponden para mantener una interfaz clara.
+          </p>
+          <p class="text-muted small mb-0">
+            Si necesitas modificar transacciones existentes, contacta a un administrador.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Seguridad -->
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">🔒 Tu Seguridad es Importante</h5>
+        </div>
+        <div class="card-body">
+          <p>Como Operador, tu rol se limita a ingresar transacciones. Las siguientes protecciones están activas:</p>
+          <ul>
+            <li><strong>Validación de datos:</strong> Todos tus datos se validan antes de guardarse</li>
+            <li><strong>Protección XSS:</strong> Tus entradas se sanitizan automáticamente</li>
+            <li><strong>Seguridad NoSQL:</strong> No puedes ejecutar consultas especiales</li>
+            <li><strong>Restricción de rol:</strong> Solo ves las funciones permitidas para tu perfil</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

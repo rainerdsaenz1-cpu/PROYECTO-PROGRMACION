@@ -1,0 +1,144 @@
+{% extends 'plantilla.html' %}
+{% block title %}Editar Transacción{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-warning text-dark">
+        <h3 class="mb-0">✏️ Editar Transacción</h3>
+      </div>
+      <div class="card-body">
+        {% if registro %}
+        <div class="alert alert-info">
+          <strong>ID:</strong> <code>{{ registro.id }}</code><br>
+          <strong>Creada por:</strong> {{ registro.get('usuario_creador', 'Sistema') }}<br>
+          <strong>Fecha de creación:</strong> {{ registro.fecha_hora }}
+        </div>
+
+        <form method="POST" class="needs-validation" novalidate>
+          {{ csrf_field() }}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nombre" class="form-label">Nombre:</label>
+              <input type="text" 
+                     id="nombre"
+                     name="nombre" 
+                     class="form-control" 
+                     value="{{ registro.nombre }}"
+                     required
+                     minlength="1"
+                     maxlength="100">
+              <div class="invalid-feedback">
+                Nombre requerido (máximo 100 caracteres)
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="apellido" class="form-label">Apellido:</label>
+              <input type="text" 
+                     id="apellido"
+                     name="apellido" 
+                     class="form-control" 
+                     value="{{ registro.apellido }}"
+                     required
+                     minlength="1"
+                     maxlength="100">
+              <div class="invalid-feedback">
+                Apellido requerido (máximo 100 caracteres)
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="tipo" class="form-label">Tipo de Transacción:</label>
+              <select id="tipo" name="tipo" class="form-select" required>
+                <option value="">-- Selecciona --</option>
+                <option value="pago" {% if registro.tipo == 'pago' %}selected{% endif %}>Pago</option>
+                <option value="crédito" {% if registro.tipo == 'crédito' %}selected{% endif %}>Crédito</option>
+                <option value="transferencia" {% if registro.tipo == 'transferencia' %}selected{% endif %}>Transferencia</option>
+                <option value="depósito" {% if registro.tipo == 'depósito' %}selected{% endif %}>Depósito</option>
+              </select>
+              <div class="invalid-feedback">
+                Debes seleccionar un tipo de transacción
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="valor" class="form-label">Valor (Monto):</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" 
+                       id="valor"
+                       name="valor" 
+                       class="form-control" 
+                       value="{{ "%.2f"|format(registro.valor) }}"
+                       required
+                       min="0.01"
+                       max="999999.99"
+                       step="0.01">
+              </div>
+              <div class="form-text">Entre 0.01 y 999,999.99</div>
+              <div class="invalid-feedback">
+                Valor requerido (entre 0.01 y 999,999.99)
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="/admin" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-success btn-lg">
+              💾 Guardar Cambios
+            </button>
+          </div>
+        </form>
+
+        {% else %}
+        <div class="alert alert-danger">
+          <strong>Error:</strong> No se encontró la transacción para editar.
+        </div>
+        <a href="/admin" class="btn btn-primary">Volver al Panel Admin</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Información de Seguridad -->
+    <div class="card mt-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">🔒 Protecciones en la Edición</h5>
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li><strong>Validación de Datos:</strong> Todos los campos se validan antes de guardar</li>
+          <li><strong>Sanitización:</strong> Se eliminan caracteres peligrosos automáticamente</li>
+          <li><strong>Auditoría:</strong> Se registra quién y cuándo se realizó la modificación</li>
+          <li><strong>Restricción de Rol:</strong> Solo administradores pueden editar transacciones</li>
+          <li><strong>Validación de ID:</strong> Se verifica que el ObjectId sea válido</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // Validación del formulario en el cliente
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var forms = document.querySelectorAll('.needs-validation');
+      Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+</script>
+{% endblock %}
+{% endblock %}
