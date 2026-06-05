@@ -7,7 +7,7 @@
 #Pasos de instalación:
 1. Abrir Docker Desktop
 2. Clonar o descargar el proyecto:
-   (url repositorio GITHUB)
+   url repositorio git: (https://github.com/rainerdsaenz1-cpu/PROYECTO-PROGRMACION)
    Code → Download ZIP
 3. Crear entorno virtual(Terminal):
    ```
