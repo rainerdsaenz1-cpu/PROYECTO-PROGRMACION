@@ -14,91 +14,93 @@
       --success-color: #27ae60;
       --warning-color: #f39c12;
     }
-    
+
     body {
       background-color: #ecf0f1;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
     }
-    
+
+    .main-content {
+      flex: 1;
+      padding-bottom: 2rem;
+    }
+
     .navbar {
       background-color: var(--primary-color);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
+
     .navbar-brand {
       font-weight: bold;
       font-size: 1.5rem;
       color: white !important;
     }
-    
+
     .nav-link {
       color: rgba(255,255,255,0.8) !important;
       transition: color 0.3s;
     }
-    
+
     .nav-link:hover {
       color: white !important;
     }
-    
+
     .btn-primary {
       background-color: var(--secondary-color);
       border-color: var(--secondary-color);
     }
-    
+
     .btn-primary:hover {
       background-color: #2980b9;
       border-color: #2980b9;
     }
-    
+
     .btn-danger {
       background-color: var(--danger-color);
       border-color: var(--danger-color);
     }
-    
+
     .btn-success {
       background-color: var(--success-color);
       border-color: var(--success-color);
     }
-    
+
     .card {
       border: none;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       border-top: 4px solid var(--secondary-color);
     }
-    
+
     .alert {
       border: none;
       border-left: 4px solid;
     }
-    
-    .alert-success {
-      border-left-color: var(--success-color);
-    }
-    
-    .alert-danger {
-      border-left-color: var(--danger-color);
-    }
-    
-    .alert-warning {
-      border-left-color: var(--warning-color);
-    }
-    
-    .alert-info {
-      border-left-color: var(--secondary-color);
-    }
-    
+
+    .alert-success { border-left-color: var(--success-color); }
+    .alert-danger  { border-left-color: var(--danger-color); }
+    .alert-warning { border-left-color: var(--warning-color); }
+    .alert-info    { border-left-color: var(--secondary-color); }
+
     .table-striped tbody tr:nth-of-type(odd) {
       background-color: rgba(52, 152, 219, 0.05);
     }
-    
+
     .form-control:focus, .form-select:focus {
       border-color: var(--secondary-color);
       box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
     }
-    
+
     .btn-sm {
       font-size: 0.85rem;
       padding: 0.4rem 0.8rem;
+    }
+
+    footer {
+      flex-shrink: 0;
     }
   </style>
   {% block extra_css %}{% endblock %}
@@ -140,8 +142,8 @@
     </div>
   </nav>
 
-  <!-- Alertas Flash -->
-  <div class="container mt-4">
+  <!-- Contenido principal -->
+  <div class="container mt-4 main-content">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -153,12 +155,11 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Contenido -->
     {% block content %}{% endblock %}
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white text-center py-4 mt-5">
+  <footer class="bg-dark text-white text-center py-4 mt-auto">
     <p class="mb-0">© 2026 Banco Seguro | Aplicación con protección contra XSS e inyección NoSQL</p>
   </footer>
 
