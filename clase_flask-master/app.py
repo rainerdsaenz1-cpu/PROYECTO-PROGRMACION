@@ -341,6 +341,7 @@ def operador():
             "tipo": tipo,
             "valor": valor_numerico,
             "usuario_creador": session.get('usuario_nombre'),
+            "usuario_creador_id": ObjectId(session['usuario_id']) if session.get('usuario_id') else None,
             "fecha_hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "eliminada": False
         }
@@ -379,10 +380,41 @@ def admin():
         # Mostrar todas las transacciones activas
         registros = list(transacciones_col.find({"eliminada": False}))
     
-    # Convertir ObjectId a string para mostrar en la plantilla
+    # Convertir ObjectId a string y calcular estado del creador
     for reg in registros:
         reg['_id'] = str(reg['_id'])
-    
+        reg['usuario_creador'] = reg.get('usuario_creador', '')
+        reg['usuario_creador_display'] = reg['usuario_creador']
+        reg['creador_estado'] = 'Activo'
+
+        if reg['usuario_creador'] == '[usuario eliminado]':
+            reg['usuario_creador_display'] = 'Usuario Eliminado'
+            reg['creador_estado'] = 'Eliminado'
+            continue
+
+        creador_id = reg.get('usuario_creador_id')
+        if creador_id:
+            try:
+                object_id = ObjectId(creador_id) if isinstance(creador_id, str) else creador_id
+                creador_usuario = usuarios_col.find_one({'_id': object_id}, {'username': 1, 'activo': 1})
+            except Exception:
+                creador_usuario = None
+
+            if creador_usuario:
+                reg['usuario_creador_display'] = creador_usuario.get('username', reg['usuario_creador'])
+                reg['creador_estado'] = 'Activo' if creador_usuario.get('activo', False) else 'Eliminado'
+            else:
+                reg['usuario_creador_display'] = 'Usuario Eliminado'
+                reg['creador_estado'] = 'Eliminado'
+        else:
+            if reg['usuario_creador']:
+                creador_usuario = usuarios_col.find_one({'username': reg['usuario_creador']}, {'activo': 1})
+                if creador_usuario:
+                    reg['creador_estado'] = 'Activo' if creador_usuario.get('activo', False) else 'Eliminado'
+                else:
+                    reg['usuario_creador_display'] = 'Usuario Eliminado'
+                    reg['creador_estado'] = 'Eliminado'
+
     return render_template('admin.html',
                            registros=registros,
                            busqueda=escape_html(id_buscar),
@@ -455,11 +487,6 @@ def editar(id_transaccion):
         flash('Transacción no encontrada.', 'danger')
         return redirect(url_for('admin'))
 
-    # Bloquear edición si el usuario creador fue eliminado
-    if registro.get('usuario_creador') == '[usuario eliminado]':
-        flash('No se puede editar una transacción de un usuario eliminado.', 'warning')
-        return redirect(url_for('admin'))
-    
     return render_template('editar.html',
                            registro=registro,
                            usuario_nombre=session.get('usuario_nombre'))
@@ -485,7 +512,7 @@ def eliminar(id_transaccion):
     )
     
     if resultado.modified_count > 0:
-        flash('✅ Transacción desactivada correctamente', 'success')
+        flash('✅ Transacción eliminada correctamente', 'success')
     else:
         flash('Transacción no encontrada.', 'warning')
     
@@ -550,10 +577,7 @@ def eliminar_usuario(id_usuario):
     
     # Anonimizar transacciones del usuario
     if resultado.modified_count > 0:
-        transacciones_col.update_many(
-            {"usuario_creador": usuario_a_eliminar['username']},
-            {"$set": {"usuario_creador": "[usuario eliminado]"}}
-        )
+        # Preservar el nombre del creador en transacciones para mantener trazabilidad
         flash('Usuario desactivado correctamente.', 'success')
     else:
         flash('No se pudo desactivar el usuario.', 'warning')
