@@ -36,12 +36,6 @@
       </div>
     </div>
 
-    <!-- Información de Seguridad -->
-    <div class="alert alert-success" role="alert">
-      <strong>✅ Zona Segura:</strong> Los datos se muestran con escape HTML correcto. 
-      No es posible ejecutar código JavaScript o NoSQL injection en este panel.
-    </div>
-
     <!-- Tabla de Transacciones -->
     {% if registros|length > 0 %}
     <div class="table-responsive">
@@ -54,7 +48,8 @@
             <th>Tipo</th>
             <th>Valor</th>
             <th>Fecha/Hora</th>
-            <th>Creador</th>
+            <th>Usuario</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -76,18 +71,21 @@
               <small>{{ reg.fecha_hora }}</small>
             </td>
             <td>
-              <small>{{ reg.get('usuario_creador', 'Sistema') }}</small>
+              <small>{{ reg.usuario_creador_display or reg.usuario_creador or '—' }}</small>
             </td>
             <td>
-              {% if reg.get('usuario_creador') != '[usuario eliminado]' %}
-                <a href="/editar/{{ reg._id }}" class="btn btn-sm btn-warning" title="Modificar">
-                  ✏️ Editar
-                </a>
+              {% if reg.creador_estado == 'Activo' %}
+                <span class="badge bg-success">Activo</span>
+              {% elif reg.creador_estado == 'Eliminado' %}
+                <span class="badge bg-danger">Eliminado</span>
               {% else %}
-                <button class="btn btn-sm btn-secondary" disabled title="Bloqueado">
-                  🔒 Bloqueado
-                </button>
+                —
               {% endif %}
+            </td>
+            <td>
+              <a href="/editar/{{ reg._id }}" class="btn btn-sm btn-warning" title="Modificar">
+                ✏️ Editar
+              </a>
               <form method="POST" action="/eliminar/{{ reg._id }}" style="display:inline;" 
                     onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta transacción?');">
                 {{ csrf_field() }}
