@@ -319,7 +319,7 @@ def operador():
             return redirect(url_for('operador'))
         
         # Validar tipo de transacción (usar lista de valores permitidos)
-        tipos_permitidos = ['pago', 'crédito', 'transferencia', 'depósito']
+        tipos_permitidos = ['pago', 'crédito']
         tipo = request.form.get('tipo', '').strip()
         if tipo not in tipos_permitidos:
             flash(f'Tipo de transacción no válido. Permitidos: {", ".join(tipos_permitidos)}', 'danger')
@@ -417,7 +417,7 @@ def editar(id_transaccion):
             flash(f'Apellido: {msg}', 'danger')
             return redirect(url_for('editar', id_transaccion=id_transaccion))
         
-        tipos_permitidos = ['pago', 'crédito', 'transferencia', 'depósito']
+        tipos_permitidos = ['pago', 'crédito']
         tipo = request.form.get('tipo', '').strip()
         if tipo not in tipos_permitidos:
             flash('Tipo de transacción no válido.', 'danger')
