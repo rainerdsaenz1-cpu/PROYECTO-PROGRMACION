@@ -2,7 +2,7 @@
 {% block title %}Panel del Operador{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
+<div class="row justify-content-center mt-5 mb-5">
   <div class="col-lg-8">
     <div class="card">
       <div class="card-header bg-primary text-white">
@@ -111,24 +111,9 @@
         </form>
       </div>
     </div>
-
-    <!-- Información de Seguridad -->
-    <div class="card mt-4">
-      <div class="card-header bg-info text-white">
-        <h5 class="mb-0">🔒 Protecciones Activas</h5>
-      </div>
-      <div class="card-body">
-        <ul class="mb-0">
-          <li><strong>Validación de Datos:</strong> Todos los campos se validan antes de enviar</li>
-          <li><strong>Sanitización:</strong> Se eliminan caracteres peligrosos automáticamente</li>
-          <li><strong>Protección XSS:</strong> Escapado correcto de HTML</li>
-          <li><strong>Prevención NoSQL:</strong> Validación contra operadores especiales</li>
-          <li><strong>Auditoría:</strong> Se registra quién crea cada transacción</li>
-        </ul>
-      </div>
-    </div>
   </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
@@ -159,5 +144,4 @@
     }
   });
 </script>
-{% endblock %}
 {% endblock %}
