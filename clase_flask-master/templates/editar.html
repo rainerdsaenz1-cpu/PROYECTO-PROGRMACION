@@ -12,7 +12,7 @@
         {% if registro %}
         <div class="alert alert-info">
           <strong>ID:</strong> <code>{{ registro.id }}</code><br>
-          <strong>Creada por:</strong> {{ registro.get('usuario_creador', 'Sistema') }}<br>
+          <strong>Creada por:</strong> {% if registro.usuario_creador == '[usuario eliminado]' %}Usuario Eliminado{% else %}{{ registro.usuario_creador }}{% endif %}<br>
           <strong>Fecha de creación:</strong> {{ registro.fecha_hora }}
         </div>
 
