@@ -57,8 +57,6 @@
                 <option value="">-- Selecciona --</option>
                 <option value="pago" {% if registro.tipo == 'pago' %}selected{% endif %}>Pago</option>
                 <option value="crédito" {% if registro.tipo == 'crédito' %}selected{% endif %}>Crédito</option>
-                <option value="transferencia" {% if registro.tipo == 'transferencia' %}selected{% endif %}>Transferencia</option>
-                <option value="depósito" {% if registro.tipo == 'depósito' %}selected{% endif %}>Depósito</option>
               </select>
               <div class="invalid-feedback">
                 Debes seleccionar un tipo de transacción
